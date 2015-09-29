@@ -1,0 +1,2 @@
+# myOcjaProject
+syndicate betting app
