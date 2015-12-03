@@ -23,6 +23,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 
 public class MainScreen extends JDialog {
 
@@ -35,24 +37,19 @@ public class MainScreen extends JDialog {
 	private JButton btnViewExistingPunters;
 	private JList<String> punterList = new JList<String>();
 	private ArrayList<String> punters = new ArrayList<String>();
+	private ArrayList<Punter> realPunters = new ArrayList<Punter>();
+	
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		try {
-			MainScreen dialog = new MainScreen();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+
 
 	/**
 	 * Create the dialog.
 	 */
 	public MainScreen() {
+
 		setBounds(100, 100, 362, 355);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -62,7 +59,10 @@ public class MainScreen extends JDialog {
 
 			String[] puntArr = new String[punters.size()];
 			{
+
+
 				MainScreen.this.punters.toArray(puntArr);
+				punterList.setListData(puntArr);
 			}
 			public int getSize() {
 				return puntArr.length;
@@ -71,11 +71,16 @@ public class MainScreen extends JDialog {
 				return puntArr[index];
 			}
 		});
+
+		
+		
 		{
 			btnViewExistingPunters = new JButton("View punter stats");
 			btnViewExistingPunters.setEnabled(false);
 			btnViewExistingPunters.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					new PunterStats(realPunters.get(punterList.getSelectedIndex())).setVisible(true);
+
 				}
 			});
 			btnViewExistingPunters.setBounds(10, 193, 141, 23);
@@ -89,9 +94,11 @@ public class MainScreen extends JDialog {
 				if(punterList.isSelectionEmpty()){
 					btnViewExistingPunters.setEnabled(false);
 					btnDelete.setEnabled(false);
+
 				}else{
 					btnViewExistingPunters.setEnabled(true);
 					btnDelete.setEnabled(true);
+					
 				}
 			}
 		});
@@ -117,9 +124,14 @@ public class MainScreen extends JDialog {
 					punters.add(textFieldNewPunterName.getText());
 					String[] puntArr = new String[punters.size()];
 					punters.toArray(puntArr);
-					punterList.setListData(puntArr);
+					
+					Punter p = new Punter();
+					p.setName(textFieldNewPunterName.getText());
+					realPunters.add(p);
+					System.out.println(p.getName());
 					textFieldNewPunterName.setText("");
-
+					Serializer.serialize(realPunters, "Punters.data");
+					punterList.setListData(puntArr);
 				}else{
 
 					jop.showMessageDialog(null, "Please enter a valid name");
@@ -136,7 +148,7 @@ public class MainScreen extends JDialog {
 				if(chckbxAddNewPunter.isSelected()){
 					textFieldNewPunterName.setVisible(true);
 					btnAdd.setVisible(true);
-				
+
 				}else {
 					textFieldNewPunterName.setVisible(false);
 					btnAdd.setVisible(false);
@@ -145,13 +157,15 @@ public class MainScreen extends JDialog {
 		});
 		chckbxAddNewPunter.setBounds(10, 223, 158, 23);
 		contentPanel.add(chckbxAddNewPunter);
-		
+
 		btnDelete = new JButton("Delete");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int temp = punterList.getSelectedIndex();
 				System.out.println(temp);
 				punters.remove(temp);
+				realPunters.remove(temp);
+				Serializer.serialize(realPunters, "Punters.data");
 				String[] puntArr = new String[punters.size()];
 				punters.toArray(puntArr);
 				punterList.setListData(puntArr);
@@ -172,6 +186,28 @@ public class MainScreen extends JDialog {
 			JPanel buttonPane = new JPanel();
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			buttonPane.setLayout(null);
+		}
+		
+		if(new File("Punters.data").exists()){
+			System.out.println("working");
+			try {
+				realPunters = (ArrayList<Punter>) Serializer.unserialize("Punters.data");
+
+				for(Punter p : realPunters){
+					punters.add(p.getName());
+					System.out.println(p.getName());
+				}
+				System.out.println(punters.size());
+				
+				String[] puntArr = new String[punters.size()];
+				this.punters.toArray(puntArr);
+				punterList.setListData(puntArr);
+				
+
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}
 }
