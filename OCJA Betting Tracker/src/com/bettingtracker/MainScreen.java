@@ -10,6 +10,8 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
@@ -25,24 +27,24 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import javax.swing.SwingConstants;
 
 public class MainScreen extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private JOptionPane jop = new JOptionPane();
+
 	private JTextField textFieldNewPunterName;
 	private JCheckBox chckbxAddNewPunter;
 	private JButton btnAdd;
 	private JButton btnDelete;
 	private JButton btnViewExistingPunters;
 	private JList<String> punterList = new JList<String>();
-	private ArrayList<String> punters = new ArrayList<String>();
-	private ArrayList<Punter> realPunters = new ArrayList<Punter>();
-	
+	//private ArrayList<String> punters = new ArrayList<String>();
+	//static ArrayList<Punter> realPunters = new ArrayList<Punter>();
+	private PunterHandler ph = new PunterHandler(new ArrayList<Punter>());
+	private JLabel lblMainMenu;
 
-	/**
-	 * Launch the application.
-	 */
+
 
 
 	/**
@@ -50,18 +52,18 @@ public class MainScreen extends JDialog {
 	 */
 	public MainScreen() {
 
-		setBounds(100, 100, 362, 355);
+		setBounds(100, 100, 353, 353);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		punterList.setModel(new AbstractListModel<String>(){
 
-			String[] puntArr = new String[punters.size()];
+			String[] puntArr = new String[ph.getPunterNames().size()];
 			{
 
 
-				MainScreen.this.punters.toArray(puntArr);
+				MainScreen.this.ph.getPunterNames().toArray(puntArr);
 				punterList.setListData(puntArr);
 			}
 			public int getSize() {
@@ -72,18 +74,58 @@ public class MainScreen extends JDialog {
 			}
 		});
 
-		
-		
+
+
+//		new Thread(new Runnable(){
+//
+//			@Override
+//			public void run() {
+//				while(true){
+//
+//					try {
+//						Thread.sleep(3000);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					
+//					String[] puntArr = new String[ph.getPunterNames().size()];
+//
+//					ph.getPunterNames().toArray(puntArr);
+//					boolean isSame = true;
+//					for(int i = 0; i < ph.getPunterNames().size(); i++){
+//						System.out.println("Size"+ph.getPunterNames().size());
+//						if(!punterList.getModel().getElementAt(i).equals(ph.getPunterNames().get(i))){
+//							isSame = false;
+//							break;
+//						}
+//					}
+//					
+//					if(!isSame){
+//						punterList.setListData(puntArr);
+//					}
+//					
+//					
+//
+//				}
+//			}
+//
+//		}).start();;
+
 		{
 			btnViewExistingPunters = new JButton("View punter stats");
 			btnViewExistingPunters.setEnabled(false);
 			btnViewExistingPunters.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					new PunterStats(realPunters.get(punterList.getSelectedIndex())).setVisible(true);
-
+					if(punterList.getSelectedIndex() >= 0){
+						ph.setCurrentPunter(ph.getRealPunters().get(punterList.getSelectedIndex()));
+						new PunterStats(ph).setVisible(true);
+					}else{
+						JOptionPane.showMessageDialog(MainScreen.this, "No punter selected");
+					}
 				}
 			});
-			btnViewExistingPunters.setBounds(10, 193, 141, 23);
+			btnViewExistingPunters.setBounds(9, 209, 141, 23);
 			contentPanel.add(btnViewExistingPunters);
 		}
 
@@ -98,48 +140,51 @@ public class MainScreen extends JDialog {
 				}else{
 					btnViewExistingPunters.setEnabled(true);
 					btnDelete.setEnabled(true);
-					
+
 				}
 			}
 		});
 
 
-		punterList.setBounds(9, 11, 308, 171);
+		punterList.setBounds(9, 27, 308, 171);
 		contentPanel.add(punterList);
 
 		textFieldNewPunterName = new JTextField();
 		textFieldNewPunterName.setVisible(false);
-		textFieldNewPunterName.setBounds(10, 274, 208, 20);
+		textFieldNewPunterName.setBounds(9, 285, 209, 20);
 		contentPanel.add(textFieldNewPunterName);
 		textFieldNewPunterName.setColumns(10);
 
 		JLabel lblName = new JLabel("Name");
-		lblName.setBounds(10, 259, 46, 14);
+		lblName.setBounds(9, 269, 33, 14);
 		contentPanel.add(lblName);
 
 		btnAdd = new JButton("Add");
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!textFieldNewPunterName.getText().equals("")){
-					punters.add(textFieldNewPunterName.getText());
-					String[] puntArr = new String[punters.size()];
-					punters.toArray(puntArr);
-					
+					ph.getPunterNames().add(textFieldNewPunterName.getText());
+					String[] puntArr = new String[ph.getPunterNames().size()];
+					ph.getPunterNames().toArray(puntArr);
+
 					Punter p = new Punter();
 					p.setName(textFieldNewPunterName.getText());
-					realPunters.add(p);
-					System.out.println(p.getName());
+					ph.getRealPunters().add(p);
+					
+					//System.out.println(p.getName());
 					textFieldNewPunterName.setText("");
-					Serializer.serialize(realPunters, "Punters.data");
+					Serializer.serialize(ph.getRealPunters(), "Punters.data");
 					punterList.setListData(puntArr);
+					
+					updateList();
 				}else{
 
-					jop.showMessageDialog(null, "Please enter a valid name");
+					JOptionPane.showMessageDialog(MainScreen.this, "Please enter a valid name");
 				}
 			}
 		});
 		btnAdd.setVisible(false);
-		btnAdd.setBounds(228, 273, 89, 23);
+		btnAdd.setBounds(228, 284, 89, 23);
 		contentPanel.add(btnAdd);
 
 		chckbxAddNewPunter = new JCheckBox("Add new punter");
@@ -147,15 +192,17 @@ public class MainScreen extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				if(chckbxAddNewPunter.isSelected()){
 					textFieldNewPunterName.setVisible(true);
+					lblName.setVisible(true);
 					btnAdd.setVisible(true);
 
 				}else {
+					lblName.setVisible(false);
 					textFieldNewPunterName.setVisible(false);
 					btnAdd.setVisible(false);
 				}
 			}
 		});
-		chckbxAddNewPunter.setBounds(10, 223, 158, 23);
+		chckbxAddNewPunter.setBounds(10, 239, 158, 23);
 		contentPanel.add(chckbxAddNewPunter);
 
 		btnDelete = new JButton("Delete");
@@ -163,11 +210,11 @@ public class MainScreen extends JDialog {
 			public void actionPerformed(ActionEvent arg0) {
 				int temp = punterList.getSelectedIndex();
 				System.out.println(temp);
-				punters.remove(temp);
-				realPunters.remove(temp);
-				Serializer.serialize(realPunters, "Punters.data");
-				String[] puntArr = new String[punters.size()];
-				punters.toArray(puntArr);
+				ph.getPunterNames().remove(temp);
+				ph.getRealPunters().remove(temp);
+				Serializer.serialize(ph.getRealPunters(), "Punters.data");
+				String[] puntArr = new String[ph.getPunterNames().size()];
+				ph.getPunterNames().toArray(puntArr);
 				punterList.setListData(puntArr);
 				if(punterList.isSelectionEmpty()){
 					btnDelete.setEnabled(false);
@@ -179,35 +226,61 @@ public class MainScreen extends JDialog {
 			}
 		});
 		btnDelete.setEnabled(false);
-		btnDelete.setBounds(228, 193, 89, 23);
+		btnDelete.setBounds(228, 209, 89, 23);
 		contentPanel.add(btnDelete);
+		
+		lblMainMenu = new JLabel("Main Menu");
+		lblMainMenu.setHorizontalAlignment(SwingConstants.CENTER);
+		lblMainMenu.setBounds(0, 0, 337, 14);
+		contentPanel.add(lblMainMenu);
 		lblName.setVisible(false);
 		{
 			JPanel buttonPane = new JPanel();
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			buttonPane.setLayout(null);
 		}
-		
+
 		if(new File("Punters.data").exists()){
 			System.out.println("working");
 			try {
-				realPunters = (ArrayList<Punter>) Serializer.unserialize("Punters.data");
-
+				ArrayList<Punter> realPunters = (ArrayList<Punter>) Serializer.unserialize("Punters.data");
+				ph = new PunterHandler(realPunters);
 				for(Punter p : realPunters){
-					punters.add(p.getName());
+					ph.getPunterNames().add(p.getName());
 					System.out.println(p.getName());
 				}
-				System.out.println(punters.size());
-				
-				String[] puntArr = new String[punters.size()];
-				this.punters.toArray(puntArr);
+				System.out.println(ph.getPunterNames().size());
+
+				String[] puntArr = new String[ph.getPunterNames().size()];
+				this.ph.getPunterNames().toArray(puntArr);
 				punterList.setListData(puntArr);
-				
+
 
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
+	}
+	
+	private void updateList(){
+		String[] puntArr = new String[ph.getPunterNames().size()];
+
+		ph.getPunterNames().toArray(puntArr);
+		
+		punterList.setListData(puntArr);
+		
+//		boolean isSame = true;
+//		for(int i = 0; i < ph.getPunterNames().size(); i++){
+//			System.out.println("Size"+ph.getPunterNames().size());
+//			//if(!punterList.getModel().getElementAt(i).equals(ph.getPunterNames().get(i))){
+//				isSame = false;
+//				break;
+//			//}
+//		}
+		
+		//if(!isSame){
+			
+		//}
 	}
 }

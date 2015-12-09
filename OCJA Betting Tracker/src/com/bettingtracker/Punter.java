@@ -22,8 +22,8 @@ public class Punter implements Serializable {
 		if(wins==0){
 			return 0;
 		}
-		this.successRate = wins/(wins+losses)*100;
-		return successRate;
+		this.successRate = (wins/(wins+losses))*100;
+		return Double.parseDouble(checkDecimal(successRate));
 	}
 	public String getName() {
 		return name;
@@ -58,14 +58,25 @@ public class Punter implements Serializable {
 	public void setName(String temName) {
 		name = temName;
 	}
-	public void setBalance(int temInvestment) {
-		balance = temInvestment;
+	public void setBalance(double temInvestment) {
+		balance += temInvestment;
 	}
 	public void setProfit(int temProfit) {
 		profit = temProfit;
 	}
 	public void setLoss(int temloss) {
 		loss = temloss;
+	}
+	
+	public String checkDecimal(double d){
+		String temp = String.valueOf(d);
+		int indexOfDecimal = temp.indexOf('.');
+		if(indexOfDecimal==temp.length()-2){
+			temp=temp+"0";
+			return temp;
+		} 
+
+		return "" + d;
 	}
 
 }
