@@ -1,6 +1,7 @@
 package com.bettingtracker;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -22,13 +23,11 @@ import javax.swing.JSlider;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 
-public class Statseditor extends JDialog {//implements Callable {
+public class Statseditor extends JPanel implements Callable {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField textFieldNewName;
 	private JTextField textFieldDepositMoney;
-	private JComboBox comboBoxWins;
-	private JComboBox comboBoxLosses;
 	private Integer[] values = {0,1,2,3,4,5};
 	
 	
@@ -36,11 +35,11 @@ public class Statseditor extends JDialog {//implements Callable {
 	/**
 	 * Create the dialog.
 	 */
-	public Statseditor(final PunterHandler ph, Callable call) {
-		setBounds(100, 100, 450, 300);
-		getContentPane().setLayout(new BorderLayout());
+	public Statseditor(final PunterHandler ph, Callable call,OpeningScreen os) {
+		setBounds(100, 100, 272, 300);
+		setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
 			JButton btnSave = new JButton("Save");
@@ -59,21 +58,24 @@ public class Statseditor extends JDialog {//implements Callable {
 						JOptionPane.showMessageDialog(Statseditor.this, "Deposit must be at least one number long");
 						isValid = false;
 					}else{
-						ph.getCurrentPunter().setBalance(Double.parseDouble(textFieldDepositMoney.getText()));
+						ph.getCurrentPunter().setBalance(ph.getCurrentPunter().getBalance()+Double.parseDouble(textFieldDepositMoney.getText()));
 						Serializer.serialize(ph.getRealPunters(), "Punters.data");
 						isValid = true;
 					}
 					
 					if(isValid){
-					ph.getCurrentPunter().setWins((Integer)comboBoxWins.getSelectedItem()+ph.getCurrentPunter().getWins());
-					ph.getCurrentPunter().setLosses((Integer)comboBoxLosses.getSelectedItem()+ph.getCurrentPunter().getLosses());
+//					ph.getCurrentPunter().setWins((Integer)comboBoxWins.getSelectedItem()+ph.getCurrentPunter().getWins());
+//					ph.getCurrentPunter().setLosses((Integer)comboBoxLosses.getSelectedItem()+ph.getCurrentPunter().getLosses());
 					call.call(ph);
-					Serializer.serialize(ph.getRealPunters(), "Punters.data");
-					dispose();
+					PunterStats ps = new PunterStats(ph,os);
+					os.setContentPane(ps);
+					ps.setBounds(os.getBounds().x, os.getBounds().y, ps.getBounds().width,ps.getBounds().height);
+					os.setBounds(ps.getBounds());
+					
 					}
 				}
 			});
-			btnSave.setBounds(335, 228, 89, 23);
+			btnSave.setBounds(142, 228, 89, 23);
 			contentPanel.add(btnSave);
 		}
 		{
@@ -115,54 +117,56 @@ public class Statseditor extends JDialog {//implements Callable {
 		sliderDeposit.setMinimum(0);
 		sliderDeposit.setValue(0);
 		
-		JButton btnOddsCalculator = new JButton("Odds Calculator");
-		btnOddsCalculator.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new OddsCalculator(ph).setVisible(true);
-				
-			}
-		});
-		btnOddsCalculator.setBounds(10, 228, 135, 23);
-		contentPanel.add(btnOddsCalculator);
-		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dispose();
+				PunterStats ps = new PunterStats(ph,os);
+				os.setContentPane(ps);
+				ps.setBounds(os.getBounds().x, os.getBounds().y, ps.getBounds().width,ps.getBounds().height);
+				os.setBounds(ps.getBounds());
 			}
 		});
-		btnCancel.setBounds(236, 228, 89, 23);
+		btnCancel.setBounds(10, 228, 89, 23);
 		contentPanel.add(btnCancel);
+//		for(int i = 0; i<values.length;++i){
+//		comboBoxWins.addItem(values[i]);
+//		}
+//		for(int i = 0; i<values.length;++i){
+//			comboBoxLosses.addItem(values[i]);
+//			}
 		
-		comboBoxWins = new JComboBox();
-		comboBoxWins.setBounds(10, 153, 78, 20);
-		contentPanel.add(comboBoxWins);
-		for(int i = 0; i<values.length;++i){
-		comboBoxWins.addItem(values[i]);
-		}
-		
-		JLabel lblAddWins = new JLabel("Add wins");
-		lblAddWins.setBounds(10, 139, 78, 14);
-		contentPanel.add(lblAddWins);
-		
-		comboBoxLosses = new JComboBox();
-		comboBoxLosses.setBounds(153, 153, 78, 20);
-		contentPanel.add(comboBoxLosses);
-		for(int i = 0; i<values.length;++i){
-			comboBoxLosses.addItem(values[i]);
+		JButton btnAddWin = new JButton("Add win");
+		btnAddWin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AddWins aw = new AddWins(ph,Statseditor.this,os);
+				os.setContentPane(aw);
+				aw.setBounds(os.getBounds().x, os.getBounds().y, aw.getBounds().width,aw.getBounds().height);
+				os.setBounds(aw.getBounds());
+				
 			}
+		});
+		btnAddWin.setBounds(10, 153, 89, 23);
+		contentPanel.add(btnAddWin);
 		
-		JLabel lblAddLosses = new JLabel("Add losses");
-		lblAddLosses.setBounds(153, 139, 78, 14);
-		contentPanel.add(lblAddLosses);
+		JButton btnAddLoss = new JButton("Add loss");
+		btnAddLoss.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AddLosses al = new AddLosses(ph,Statseditor.this,os);
+				os.setContentPane(al);
+				al.setBounds(os.getBounds().x, os.getBounds().y, al.getBounds().width,al.getBounds().height);
+				os.setBounds(al.getBounds());
+			}
+		});
+		btnAddLoss.setBounds(142, 153, 89, 23);
+		contentPanel.add(btnAddLoss);
 		
 	}
 
 
 
-//	@Override
-//	public void call(PunterHandler ph) {
-//		// TODO Auto-generated method stub
-//		ph.getCurrentPunter().getBalance();
-//	}
+	@Override
+	public void call(PunterHandler ph) {
+		// TODO Auto-generated method stub
+		
+	}
 }

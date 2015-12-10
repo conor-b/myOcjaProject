@@ -1,16 +1,19 @@
 package com.bettingtracker;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
 public class Punter implements Serializable {
 
 	private String name;
-	private int balance;
-	private int profit;
-	private int loss;
+	private double balance;
+	private double profit;
+	private double loss;
 	private int wins;
 	private int losses;
 	private double successRate;
+	private DecimalFormat df = new DecimalFormat("#.##");
+
 
 	//	Punter(String name ){
 	//		this.name = name;
@@ -23,7 +26,7 @@ public class Punter implements Serializable {
 			return 0;
 		}
 		this.successRate = (wins/(wins+losses))*100;
-		return Double.parseDouble(checkDecimal(successRate));
+		return Double.parseDouble(df.format(successRate));
 	}
 	public String getName() {
 		return name;
@@ -40,43 +43,33 @@ public class Punter implements Serializable {
 	public void setLosses(int losses) {
 		this.losses = losses;
 	}
-	public double getSuccessRate() {
-		return successRate;
-	}
+//	public double getSuccessRate() {
+//		return successRate;
+//	}
 	public void setSuccessRate(double successRate) {
 		this.successRate = successRate;
 	}
-	public int getBalance() {
+	public double getBalance() {
 		return balance;
 	}
-	public int getProfit() {
+	public double getProfit() {
 		return profit;
 	}
-	public int getLoss() {
+	public double getLoss() {
 		return loss;
 	}
 	public void setName(String temName) {
 		name = temName;
 	}
 	public void setBalance(double temInvestment) {
-		balance += temInvestment;
+		balance = temInvestment;
 	}
-	public void setProfit(int temProfit) {
-		profit = temProfit;
+	public void setProfit(double temProfit) {
+		profit =  temProfit ;
 	}
-	public void setLoss(int temloss) {
+	public void setLoss(double temloss) {
 		loss = temloss;
 	}
 	
-	public String checkDecimal(double d){
-		String temp = String.valueOf(d);
-		int indexOfDecimal = temp.indexOf('.');
-		if(indexOfDecimal==temp.length()-2){
-			temp=temp+"0";
-			return temp;
-		} 
-
-		return "" + d;
-	}
-
+	
 }

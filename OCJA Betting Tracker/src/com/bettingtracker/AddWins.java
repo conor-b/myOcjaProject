@@ -10,6 +10,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JSlider;
@@ -22,7 +23,7 @@ import java.text.DecimalFormat;
 import java.awt.event.InputMethodListener;
 import java.awt.event.InputMethodEvent;
 
-public class OddsCalculator extends JDialog {
+public class AddWins extends JPanel {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField textFieldAmountPutOn;
@@ -39,12 +40,14 @@ public class OddsCalculator extends JDialog {
 
 	/**
 	 * Create the dialog.
+	 * @wbp.parser.constructor
 	 */
-	public OddsCalculator(PunterHandler ph ) {
-		setBounds(100, 100, 450, 219);
-		getContentPane().setLayout(new BorderLayout());
+	public AddWins(PunterHandler ph , Callable call , OpeningScreen os){
+
+		setBounds(100, 100, 370, 219);
+		setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 
 		JLabel lblAmountPutOn = new JLabel("Amount put on");
@@ -79,19 +82,19 @@ public class OddsCalculator extends JDialog {
 
 		JSlider sliderAmountPutOn = new JSlider();
 		sliderAmountPutOn.setValue(0);
-		sliderAmountPutOn.setMaximum(500);
-		sliderAmountPutOn.setBounds(212, 25, 200, 23);
+		sliderAmountPutOn.setMaximum((int)ph.getCurrentPunter().getBalance());
+		sliderAmountPutOn.setBounds(212, 25, 116, 23);
 		contentPanel.add(sliderAmountPutOn);
 		sliderAmountPutOn.addChangeListener(new ChangeListener() {
-			
+
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				textFieldAmountPutOn.setText(""+sliderAmountPutOn.getValue());
-				
+
 			}
 		});
-		
-		
+
+
 
 
 		textFieldOdds = new JTextField();
@@ -99,38 +102,71 @@ public class OddsCalculator extends JDialog {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if(!textFieldOdds.equals("")&containsSlash(textFieldOdds.getText())){
-					
+
 					double multpliyer = calculateOdds(textFieldOdds.getText());
 					double putOn = Double.parseDouble(textFieldAmountPutOn.getText());
 
 					lblReturned.setText("€ "+ checkDecimal(Double.parseDouble(df.format((putOn+(putOn*multpliyer))))));
 					lblGained.setText("€ "+ checkDecimal(Double.parseDouble(df.format((putOn*multpliyer)))));
-					
+
 					//ph.getCurrentPunter().setBalance(Double.parseDouble(df.format((putOn*multpliyer))));
-					
+
 				}
 			}
 		});
 		textFieldOdds.setBounds(107, 47, 86, 20);
 		contentPanel.add(textFieldOdds);
 		textFieldOdds.setColumns(10);
-		
+
 		JLabel lblOddsCalculator = new JLabel("Odds Calculator");
 		lblOddsCalculator.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOddsCalculator.setBounds(0, 0, 434, 14);
 		contentPanel.add(lblOddsCalculator);
-		
-		JButton btnOkay = new JButton("Okay");
-		btnOkay.addActionListener(new ActionListener() {
+
+		JButton btnConfirm = new JButton("Confirm");
+		btnConfirm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dispose();
+				if(textFieldAmountPutOn.getText().equals("")||textFieldOdds.getText().equals("")){
+					JOptionPane.showMessageDialog(AddWins.this, "Please type in an amount in the \"put on\" textfield and something in the \"odds\" textfield in the format \n 1\\11");
+					return;
+				}else{
+					ph.getCurrentPunter().setBalance(ph.getCurrentPunter().getBalance()+Double.parseDouble(lblGained.getText().substring(2)));
+					if(call!=null){
+						ph.getCurrentPunter().setWins(ph.getCurrentPunter().getWins()+1);
+						ph.getCurrentPunter().setProfit(ph.getCurrentPunter().getProfit()+Double.parseDouble(lblGained.getText().substring(2)));
+						call.call(ph);
+						Serializer.serialize(ph.getRealPunters(), "Punters.data");
+						Statseditor se = new Statseditor(ph,call,os);
+						os.setContentPane(se);
+						se.setBounds(os.getBounds().x, os.getBounds().y, se.getBounds().width,se.getBounds().height);
+						os.setBounds(se.getBounds());
+					}
+				}
+
+			
 			}
 		});
-		btnOkay.setBounds(51, 147, 89, 23);
-		contentPanel.add(btnOkay);
-	
+		btnConfirm.setBounds(51, 147, 89, 23);
+		contentPanel.add(btnConfirm);
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Statseditor se = new Statseditor(ph,call,os);
+				os.setContentPane(se);
+				se.setBounds(os.getBounds().x, os.getBounds().y, se.getBounds().width,se.getBounds().height);
+				os.setBounds(se.getBounds());
+			}
+		});
+		btnCancel.setBounds(237, 147, 89, 23);
+		contentPanel.add(btnCancel);
+
+
 
 	}
+//	public AddWins(PunterHandler ph ) {
+//		this(ph , null);
+//	}
 	public double calculateOdds(Object s){
 		int marker = 0;
 		//		s = comboBoxOdds.getSelectedItem().toString();
@@ -145,7 +181,7 @@ public class OddsCalculator extends JDialog {
 		System.out.println(""+leftOdds/rightOdds);
 		return leftOdds/rightOdds ;
 	}
-	
+
 	public boolean containsSlash(String s){
 		for(int i = 1;i<s.length();++i){
 			if(s.charAt(s.length()-1)=='/'){

@@ -13,7 +13,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-public class PunterStats extends JDialog implements Callable{
+public class PunterStats extends JPanel implements Callable{
 
 	private final JPanel contentPanel = new JPanel();
 	private ArrayList<JLabel> labelArr = new ArrayList<>();
@@ -24,16 +24,15 @@ public class PunterStats extends JDialog implements Callable{
 	private JLabel lblAcBalance;
 	private JLabel lblAcSuccessRate;
 	private JLabel lblAcTotalProfit;
-	private JLabel lblAcTotalLoss;
 	
 	/**
 	 * Create the dialog.
 	 */
-	public PunterStats(final PunterHandler ph) {
-		setBounds(100, 100, 256, 277);
-		getContentPane().setLayout(new BorderLayout());
+	public PunterStats(final PunterHandler ph , OpeningScreen os) {
+		setBounds(100, 100, 254, 247);
+		setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
 			JLabel lblName = new JLabel("Name:");
@@ -52,10 +51,14 @@ public class PunterStats extends JDialog implements Callable{
 		JButton btnEdit = new JButton("Edit");
 		btnEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new Statseditor(ph,PunterStats.this).setVisible(true);
+				
+				Statseditor se = new Statseditor(ph,PunterStats.this,os);
+				os.setContentPane(se);
+				se.setBounds(os.getBounds().x, os.getBounds().y, se.getBounds().width,se.getBounds().height);
+				os.setBounds(se.getBounds());
 			}
 		});
-		btnEdit.setBounds(10, 200, 89, 23);
+		btnEdit.setBounds(10, 175, 103, 23);
 		contentPanel.add(btnEdit);
 
 		JLabel lblTotalWins = new JLabel("Total wins:");
@@ -69,10 +72,6 @@ public class PunterStats extends JDialog implements Callable{
 		JLabel lblTotalProfit = new JLabel("Total profit:");
 		lblTotalProfit.setBounds(10, 150, 82, 14);
 		contentPanel.add(lblTotalProfit);
-
-		JLabel lblTotalLoss = new JLabel("Total loss:");
-		lblTotalLoss.setBounds(10, 175, 82, 14);
-		contentPanel.add(lblTotalLoss);
 
 		lblAcName = new JLabel(ph.getCurrentPunter().getName());
 		lblAcName.setBounds(116, 25, 96, 14);
@@ -123,19 +122,37 @@ public class PunterStats extends JDialog implements Callable{
 		lblAcTotalProfit = new JLabel("€ "+ph.getCurrentPunter().getProfit());
 		lblAcTotalProfit.setBounds(116, 150, 96, 14);
 		contentPanel.add(lblAcTotalProfit);
-
-		lblAcTotalLoss = new JLabel("€ "+ph.getCurrentPunter().getLoss());
-		lblAcTotalLoss.setBounds(116, 175, 96, 14);
-		contentPanel.add(lblAcTotalLoss);
 		
 		JLabel lblPunterStats = new JLabel("Punter Stats");
 		lblPunterStats.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPunterStats.setBounds(0, 0, 240, 14);
 		contentPanel.add(lblPunterStats);
 		
+		JButton btnPunterList = new JButton("Punter list");
+		btnPunterList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MainScreen ms = new MainScreen(os);
+				os.setContentPane(ms);
+				ms.setBounds(os.getBounds().x, os.getBounds().y, ms.getBounds().width,ms.getBounds().height);
+				os.setBounds(ms.getBounds());
+			}
+		});
+		btnPunterList.setBounds(126, 175, 103, 23);
+		contentPanel.add(btnPunterList);
+		
 		
 	}
 
+	public String checkDecimal(double d){
+		String temp = String.valueOf(d);
+		int indexOfDecimal = temp.indexOf('.');
+		if(indexOfDecimal==temp.length()-2){
+			temp=temp+"0";
+			return temp;
+		} 
+
+		return "" + d;
+	}
 
 
 	@Override
@@ -145,8 +162,8 @@ public class PunterStats extends JDialog implements Callable{
 		lblAcTotalWins.setText(""+ph.getCurrentPunter().getWins());
 		lblAcTotalLosses.setText(""+ph.getCurrentPunter().getLosses());
 		lblAcBalance.setText("€ "+ph.getCurrentPunter().getBalance());
-		lblAcSuccessRate.setText(ph.getCurrentPunter().calculateSuccessRate()+"%");
+		lblAcSuccessRate.setText(checkDecimal(ph.getCurrentPunter().calculateSuccessRate())+"%");
 		lblAcTotalProfit.setText("€ "+ph.getCurrentPunter().getProfit());
-		lblAcTotalLoss.setText("€ "+ph.getCurrentPunter().getLoss());
+		
 	}
 }

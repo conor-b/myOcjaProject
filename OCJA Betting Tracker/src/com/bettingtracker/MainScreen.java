@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.swing.SwingConstants;
 
-public class MainScreen extends JDialog {
+public class MainScreen extends JPanel {
 
 	private final JPanel contentPanel = new JPanel();
 
@@ -50,12 +50,12 @@ public class MainScreen extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public MainScreen() {
+	public MainScreen(OpeningScreen os) {
 
-		setBounds(100, 100, 353, 353);
-		getContentPane().setLayout(new BorderLayout());
+		setBounds(0, 0, 353, 353);
+		setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		punterList.setModel(new AbstractListModel<String>(){
 
@@ -119,7 +119,12 @@ public class MainScreen extends JDialog {
 				public void actionPerformed(ActionEvent e) {
 					if(punterList.getSelectedIndex() >= 0){
 						ph.setCurrentPunter(ph.getRealPunters().get(punterList.getSelectedIndex()));
-						new PunterStats(ph).setVisible(true);
+						PunterStats ps = new PunterStats(ph,os);
+						os.setContentPane(ps);
+						ps.setBounds(os.getBounds().x, os.getBounds().y, ps.getBounds().width,ps.getBounds().height);
+						os.setBounds(ps.getBounds());
+						
+						
 					}else{
 						JOptionPane.showMessageDialog(MainScreen.this, "No punter selected");
 					}
@@ -236,7 +241,7 @@ public class MainScreen extends JDialog {
 		lblName.setVisible(false);
 		{
 			JPanel buttonPane = new JPanel();
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			add(buttonPane, BorderLayout.SOUTH);
 			buttonPane.setLayout(null);
 		}
 

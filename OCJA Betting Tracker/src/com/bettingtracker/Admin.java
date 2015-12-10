@@ -2,13 +2,11 @@ package com.bettingtracker;
 
 public class Admin {
 
-	private String username ;
-	private String password ;
+	private String username = "con90" ;
+	private char[] password ={'1','2','3','a','b','c'};
 	
-	public Admin(){
-		this("unkown","unkown");
-	}
-	public Admin(String username,String password){
+	
+	public Admin(String username,char[] password){
 		this.username = username;
 		this.password = password;
 	}
@@ -16,7 +14,7 @@ public class Admin {
 		return username;
 	}
 	
-	public String getPassword() {
+	public char[] getPassword() {
 		return password;
 	}
 	

@@ -7,20 +7,23 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.awt.event.ActionEvent;
+import javax.swing.JPasswordField;
 
-public class OperningScreen extends JFrame {
+public class OpeningScreen extends JFrame {
 
 	
 	
 	private JPanel contentPane;
 	private JTextField textFieldUserName;
-	private JTextField textFieldPassword;
+	private JPasswordField passwordField;
 
 	/**
 	 * Launch the application.
@@ -29,7 +32,7 @@ public class OperningScreen extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					OperningScreen frame = new OperningScreen();
+					OpeningScreen frame = new OpeningScreen();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -41,10 +44,10 @@ public class OperningScreen extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public OperningScreen() {
+	public OpeningScreen() {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 369, 294);
+		setBounds(640-184, 512-147, 369, 294);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -73,18 +76,36 @@ public class OperningScreen extends JFrame {
 		lblPassword.setBounds(10, 122, 78, 14);
 		contentPane.add(lblPassword);
 		
-		textFieldPassword = new JTextField();
-		textFieldPassword.setBounds(10, 134, 184, 20);
-		contentPane.add(textFieldPassword);
-		textFieldPassword.setColumns(10);
+		passwordField = new JPasswordField();
+		passwordField.setBounds(10, 135, 184, 20);
+		contentPane.add(passwordField);
 		
 		JButton btnSignIn = new JButton("Sign In");
 		btnSignIn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new MainScreen().setVisible(true);
+					Admin ad = new Admin("con90", new char[]{'1','2','3'});
+					
+				if(textFieldUserName.getText().equals(ad.getUsername())&Arrays.equals(passwordField.getPassword(), ad.getPassword())){
+					
+					MainScreen ms = new MainScreen(OpeningScreen.this);
+					setContentPane(ms);
+					ms.setBounds(getBounds().x,getBounds().y , ms.getBounds().width,ms.getBounds().height);
+					setBounds(ms.getBounds());
+				}else{
+					JOptionPane.showMessageDialog(OpeningScreen.this, "Username or password are incorrect");
+					ad = null;
+				}
+				
+				
 			}
 		});
 		btnSignIn.setBounds(10, 177, 89, 23);
 		contentPane.add(btnSignIn);
+		
+		
+		
+		
+		
+		
 	}
 }
