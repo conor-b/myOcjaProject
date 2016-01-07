@@ -27,16 +27,8 @@ public class AddWins extends JPanel {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField textFieldAmountPutOn;
-	private String[] odds = {"1/1","2/1","3/1","4/1","5/1"};
 	private JTextField textFieldOdds;
 	private DecimalFormat df = new DecimalFormat("#.##");
-
-
-
-
-
-
-
 
 	/**
 	 * Create the dialog.
@@ -118,9 +110,9 @@ public class AddWins extends JPanel {
 		contentPanel.add(textFieldOdds);
 		textFieldOdds.setColumns(10);
 
-		JLabel lblOddsCalculator = new JLabel("Odds Calculator");
+		JLabel lblOddsCalculator = new JLabel("calculate odds and register win");
 		lblOddsCalculator.setHorizontalAlignment(SwingConstants.CENTER);
-		lblOddsCalculator.setBounds(0, 0, 434, 14);
+		lblOddsCalculator.setBounds(0, 0, 370, 14);
 		contentPanel.add(lblOddsCalculator);
 
 		JButton btnConfirm = new JButton("Confirm");
@@ -171,14 +163,14 @@ public class AddWins extends JPanel {
 		int marker = 0;
 		//		s = comboBoxOdds.getSelectedItem().toString();
 		s = textFieldOdds.getText();
-		System.out.println(s);
+		//System.out.println(s);
 		marker = ((String )s).indexOf('/');
 		((String )s).replace('/',' ');
 		String s1 = ((String )s).substring(0, marker);
 		String s2 = ((String )s).substring(marker+1);
 		double leftOdds = Double.parseDouble(s1);
 		double rightOdds = Double.parseDouble(s2);
-		System.out.println(""+leftOdds/rightOdds);
+		//System.out.println(""+leftOdds/rightOdds);
 		return leftOdds/rightOdds ;
 	}
 

@@ -2,12 +2,14 @@ package com.bettingtracker;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -24,6 +26,7 @@ public class OpeningScreen extends JFrame {
 	private JPanel contentPane;
 	private JTextField textFieldUserName;
 	private JPasswordField passwordField;
+	private ImageIcon img = new ImageIcon("syndicate.png");
 
 	/**
 	 * Launch the application.
@@ -45,6 +48,8 @@ public class OpeningScreen extends JFrame {
 	 * Create the frame.
 	 */
 	public OpeningScreen() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(img.toString()));
+		//System.out.println(img.getImage());
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(640-184, 512-147, 369, 294);
@@ -52,6 +57,7 @@ public class OpeningScreen extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		setTitle("Syndicate");
 		
 		
 		JSeparator separator = new JSeparator();
@@ -101,6 +107,8 @@ public class OpeningScreen extends JFrame {
 		});
 		btnSignIn.setBounds(10, 177, 89, 23);
 		contentPane.add(btnSignIn);
+		
+		
 		
 		
 		

@@ -43,6 +43,7 @@ public class MainScreen extends JPanel {
 	//static ArrayList<Punter> realPunters = new ArrayList<Punter>();
 	private PunterHandler ph = new PunterHandler(new ArrayList<Punter>());
 	private JLabel lblMainMenu;
+	private ArrayList<Integer> percents = new ArrayList<Integer>();
 
 
 
@@ -51,8 +52,8 @@ public class MainScreen extends JPanel {
 	 * Create the dialog.
 	 */
 	public MainScreen(OpeningScreen os) {
-
-		setBounds(0, 0, 353, 353);
+		
+		setBounds(0, 0, 331, 353);
 		setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		add(contentPanel, BorderLayout.CENTER);
@@ -130,7 +131,7 @@ public class MainScreen extends JPanel {
 					}
 				}
 			});
-			btnViewExistingPunters.setBounds(9, 209, 141, 23);
+			btnViewExistingPunters.setBounds(9, 209, 140, 23);
 			contentPanel.add(btnViewExistingPunters);
 		}
 
@@ -214,7 +215,7 @@ public class MainScreen extends JPanel {
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int temp = punterList.getSelectedIndex();
-				System.out.println(temp);
+				//System.out.println(temp);
 				ph.getPunterNames().remove(temp);
 				ph.getRealPunters().remove(temp);
 				Serializer.serialize(ph.getRealPunters(), "Punters.data");
@@ -231,12 +232,12 @@ public class MainScreen extends JPanel {
 			}
 		});
 		btnDelete.setEnabled(false);
-		btnDelete.setBounds(228, 209, 89, 23);
+		btnDelete.setBounds(177, 209, 140, 23);
 		contentPanel.add(btnDelete);
 		
 		lblMainMenu = new JLabel("Main Menu");
 		lblMainMenu.setHorizontalAlignment(SwingConstants.CENTER);
-		lblMainMenu.setBounds(0, 0, 337, 14);
+		lblMainMenu.setBounds(0, 0, 331, 14);
 		contentPanel.add(lblMainMenu);
 		lblName.setVisible(false);
 		{
@@ -246,15 +247,15 @@ public class MainScreen extends JPanel {
 		}
 
 		if(new File("Punters.data").exists()){
-			System.out.println("working");
+			//System.out.println("working");
 			try {
 				ArrayList<Punter> realPunters = (ArrayList<Punter>) Serializer.unserialize("Punters.data");
 				ph = new PunterHandler(realPunters);
 				for(Punter p : realPunters){
 					ph.getPunterNames().add(p.getName());
-					System.out.println(p.getName());
+					//System.out.println(p.getName());
 				}
-				System.out.println(ph.getPunterNames().size());
+				//System.out.println(ph.getPunterNames().size());
 
 				String[] puntArr = new String[ph.getPunterNames().size()];
 				this.ph.getPunterNames().toArray(puntArr);

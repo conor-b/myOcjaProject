@@ -123,9 +123,9 @@ public class PunterStats extends JPanel implements Callable{
 		lblAcTotalProfit.setBounds(116, 150, 96, 14);
 		contentPanel.add(lblAcTotalProfit);
 		
-		JLabel lblPunterStats = new JLabel("Punter Stats");
+		JLabel lblPunterStats = new JLabel(ph.getCurrentPunter().getName()+"'s stats");
 		lblPunterStats.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPunterStats.setBounds(0, 0, 240, 14);
+		lblPunterStats.setBounds(0, 0, 254, 14);
 		contentPanel.add(lblPunterStats);
 		
 		JButton btnPunterList = new JButton("Punter list");
@@ -158,7 +158,7 @@ public class PunterStats extends JPanel implements Callable{
 	@Override
 	public void call(PunterHandler ph) {
 		lblAcName.setText(ph.getCurrentPunter().getName());
-		System.out.println(ph.getCurrentPunter().getName());
+		//System.out.println(ph.getCurrentPunter().getName());
 		lblAcTotalWins.setText(""+ph.getCurrentPunter().getWins());
 		lblAcTotalLosses.setText(""+ph.getCurrentPunter().getLosses());
 		lblAcBalance.setText("€ "+ph.getCurrentPunter().getBalance());

@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JSlider;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import javax.swing.SwingConstants;
 
 public class Statseditor extends JPanel implements Callable {
 
@@ -80,23 +81,23 @@ public class Statseditor extends JPanel implements Callable {
 		}
 		{
 			JLabel lblEditName = new JLabel("Edit name");
-			lblEditName.setBounds(10, 11, 89, 14);
+			lblEditName.setBounds(10, 30, 89, 14);
 			contentPanel.add(lblEditName);
 		}
 		
 		textFieldNewName = new JTextField();
-		textFieldNewName.setBounds(10, 24, 221, 20);
+		textFieldNewName.setBounds(10, 44, 221, 20);
 		contentPanel.add(textFieldNewName);
 		textFieldNewName.setColumns(10);
 		textFieldNewName.setText(ph.getCurrentPunter().getName());
 		
 		JLabel lblDepositMoney = new JLabel("Deposit money");
-		lblDepositMoney.setBounds(10, 51, 89, 14);
+		lblDepositMoney.setBounds(10, 75, 89, 14);
 		contentPanel.add(lblDepositMoney);
 		
 		textFieldDepositMoney = new JTextField();
 		textFieldDepositMoney.setEditable(false);
-		textFieldDepositMoney.setBounds(10, 64, 221, 20);
+		textFieldDepositMoney.setBounds(10, 88, 221, 20);			
 		contentPanel.add(textFieldDepositMoney);
 		textFieldDepositMoney.setColumns(10);
 		textFieldDepositMoney.setText(""+Double.parseDouble("0.00"));
@@ -105,13 +106,13 @@ public class Statseditor extends JPanel implements Callable {
 		JSlider sliderDeposit = new JSlider();
 		sliderDeposit.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				System.out.println(""+sliderDeposit.getValue());
+				//System.out.println(""+sliderDeposit.getValue());
 				textFieldDepositMoney.setText(""+sliderDeposit.getValue());
 			}
 
 			
 		});
-		sliderDeposit.setBounds(10, 95, 221, 23);
+		sliderDeposit.setBounds(10, 119, 221, 23);
 		contentPanel.add(sliderDeposit);
 		sliderDeposit.setMaximum(500);
 		sliderDeposit.setMinimum(0);
@@ -159,6 +160,11 @@ public class Statseditor extends JPanel implements Callable {
 		});
 		btnAddLoss.setBounds(142, 153, 89, 23);
 		contentPanel.add(btnAddLoss);
+		
+		JLabel lblTitle = new JLabel("Edit "+ph.getCurrentPunter().getName()+"'s stats");
+		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTitle.setBounds(0, 0, 272, 14);
+		contentPanel.add(lblTitle);
 		
 	}
 
